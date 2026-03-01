@@ -191,11 +191,6 @@ func (u *authUsecase) Logout(token string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
 
-	_, err := utils.ParseRefreshToken(token, u.refreshTokenSecret)
-	if err != nil {
-		return err
-	}
-
 	if err := u.repo.RevokeRefreshToken(ctx, token); err != nil {
 		return err
 	}

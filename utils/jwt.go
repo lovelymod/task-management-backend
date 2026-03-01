@@ -14,7 +14,7 @@ func SignAccessToken(user *entity.User, secret string) (*jwt.RegisteredClaims, s
 
 	claims := &jwt.RegisteredClaims{
 		Issuer:    "blogging-platform-api",
-		Subject:   user.ID.String(),
+		Subject:   user.ID.Hex(),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
 	}
