@@ -1,17 +1,20 @@
 package entity
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
+)
 
 type User struct {
-	ID             primitive.ObjectID  `json:"id" bson:"_id"`
-	FirstName      string              `json:"firstName"`
-	LastName       string              `json:"lastName"`
-	DisplayName    string              `json:"displayName"`
-	Email          string              `json:"email"`
-	Username       string              `json:"username"`
-	HashedPassword string              `json:"-" gorm:"not null"`
-	Phone          string              `json:"phone"`
-	Avatar         string              `json:"avatar"`
-	CreatedAt      primitive.Timestamp `json:"createdAt"`
-	UpdatedAt      primitive.Timestamp `json:"updatedAt"`
+	ID             bson.ObjectID `json:"id" bson:"_id,omitempty"`
+	FirstName      string        `json:"firstName" bson:"firstName"`
+	LastName       string        `json:"lastName" bson:"lastName"`
+	DisplayName    string        `json:"displayName" bson:"displayName"`
+	Email          string        `json:"email" bson:"email"`
+	HashedPassword string        `json:"-" bson:"hashedPassword"`
+	Phone          string        `json:"phone" bson:"phone"`
+	Avatar         string        `json:"avatar" bson:"avatar"`
+	CreatedAt      time.Time     `json:"createdAt" bson:"createdAt"`
+	UpdatedAt      time.Time     `json:"updatedAt" bson:"updatedAt"`
 }

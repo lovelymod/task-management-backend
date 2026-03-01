@@ -13,7 +13,7 @@ type MongoCollections struct {
 	Users *mongo.Collection
 }
 
-func mongoInit(config *Config) *MongoCollections {
+func mongoInit(config *Config) (*mongo.Client, *MongoCollections) {
 	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(config.MONGO_CONNECTION).SetServerAPIOptions(serverAPI)
@@ -22,11 +22,6 @@ func mongoInit(config *Config) *MongoCollections {
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
 	// Send a ping to confirm a successful connection
 	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
 		panic(err)
@@ -37,5 +32,5 @@ func mongoInit(config *Config) *MongoCollections {
 		Users: client.Database("task-db").Collection("users"),
 	}
 
-	return &mc
+	return client, &mc
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,22 +11,35 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lovelymod/task-management-backend/internal/bootstrap"
+	"github.com/lovelymod/task-management-backend/internal/handler"
+	"github.com/lovelymod/task-management-backend/internal/repository"
+	"github.com/lovelymod/task-management-backend/internal/router"
+	"github.com/lovelymod/task-management-backend/internal/usecase"
 )
 
 func main() {
-	router := gin.Default()
+	r := gin.Default()
 
 	app := bootstrap.AppInit()
+	defer func() {
+		if err := app.Client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
 
-	fmt.Println(app)
+	authRepo := repository.NewAuthHandler(app.Mc)
+	authUsecase := usecase.NewAuthUsecase(authRepo, time.Second*5, app.Config)
+	authHandler := handler.NewAuthHandler(authUsecase)
 
-	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Welcome Gin Server")
-	})
+	handlers := router.Handlers{
+		AuthHandler: authHandler,
+	}
+
+	router.SetupRouter(r, &handlers)
 
 	srv := &http.Server{
 		Addr:    ":8080",
-		Handler: router.Handler(),
+		Handler: r.Handler(),
 	}
 
 	go func() {
