@@ -10,7 +10,8 @@ import (
 )
 
 type MongoCollections struct {
-	Users *mongo.Collection
+	Users         *mongo.Collection
+	RefreshTokens *mongo.Collection
 }
 
 func mongoInit(config *Config) (*mongo.Client, *MongoCollections) {
@@ -29,7 +30,8 @@ func mongoInit(config *Config) (*mongo.Client, *MongoCollections) {
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
 	mc := MongoCollections{
-		Users: client.Database("task-db").Collection("users"),
+		Users:         client.Database("task-db").Collection("users"),
+		RefreshTokens: client.Database("task-db").Collection("refresh_tokens"),
 	}
 
 	return client, &mc

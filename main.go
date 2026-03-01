@@ -35,7 +35,7 @@ func main() {
 		AuthHandler: authHandler,
 	}
 
-	router.SetupRouter(r, &handlers)
+	router.SetupRouter(r, &handlers, app.Config)
 
 	srv := &http.Server{
 		Addr:    ":8080",

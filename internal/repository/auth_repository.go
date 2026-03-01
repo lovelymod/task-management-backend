@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/lovelymod/task-management-backend/internal/bootstrap"
 	"github.com/lovelymod/task-management-backend/internal/entity"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
@@ -36,10 +38,73 @@ func (r *authRepository) GetUserByEmail(ctx context.Context, email string) ([]en
 	return exitingUser, nil
 }
 
-func (r *authRepository) Register(ctx context.Context, registerUser *entity.User) (*entity.User, error) {
+func (r *authRepository) CreateUser(ctx context.Context, registerUser *entity.User) (*entity.User, error) {
 	if _, err := r.mc.Users.InsertOne(ctx, registerUser); err != nil {
 		return nil, err
 	}
 
 	return registerUser, nil
+}
+
+func (r *authRepository) CreateRefreshToken(ctx context.Context, refreshToken *entity.RefreshToken) error {
+	if _, err := r.mc.RefreshTokens.InsertOne(ctx, refreshToken); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *authRepository) RevokeRefreshToken(ctx context.Context, token string) error {
+	filter := bson.D{{Key: "token", Value: token}}
+	update := bson.M{
+		"$set": bson.M{
+			"isRevoked": true,
+			"updatedAt": time.Now(),
+		},
+	}
+
+	if _, err := r.mc.RefreshTokens.UpdateOne(ctx, filter, update); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *authRepository) GetRefreshToken(ctx context.Context, token string) (*entity.RefreshToken, error) {
+	// สร้าง Pipeline สำหรับการทำ Aggregate (Join)
+	pipeline := mongo.Pipeline{
+		// 1. $match: กรองข้อมูลหา Token ที่ตรงกับเงื่อนไข (ทำงานคล้ายๆ FindOne)
+		bson.D{{Key: "$match", Value: bson.D{{Key: "token", Value: token}}}},
+
+		// 2. $lookup: สั่ง Join ไปที่ Collection "users"
+		bson.D{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},        // ชื่อ collection ที่เราจะไปดึงข้อมูลมา (ต้องเป็นชื่อใน DB)
+			{Key: "localField", Value: "userId"}, // ฟิลด์ในตาราง refresh_tokens ปัจจุบัน
+			{Key: "foreignField", Value: "_id"},  // ฟิลด์ที่จะไปเทียบในตาราง users
+			{Key: "as", Value: "user"},           // ชื่อฟิลด์ผลลัพธ์ที่จะเก็บลงใน Struct (ต้องตรงกับ bson:"user" ด้านบน)
+		}}},
+
+		// 3. $unwind: แปลงผลลัพธ์ User จากรูปแบบ Array ให้กลายเป็น Object ตัวเดียว
+		bson.D{{Key: "$unwind", Value: bson.D{
+			{Key: "path", Value: "$user"},
+			{Key: "preserveNullAndEmptyArrays", Value: true}, // ใส่ไว้กันพัง กรณีที่หา User ไม่เจอ
+		}}},
+	}
+
+	// ใช้คำสั่ง Aggregate แทน FindOne
+	cursor, err := r.mc.RefreshTokens.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx) // อย่าลืมปิด cursor เสมอ
+
+	// เนื่องจาก Aggregate คืนค่าเป็น Cursor เราต้องใช้ cursor.Next() เพื่อเช็กว่ามีผลลัพธ์ไหม
+	if cursor.Next(ctx) {
+		var existingRefreshToken entity.RefreshToken
+		if err := cursor.Decode(&existingRefreshToken); err != nil {
+			return nil, err
+		}
+		return &existingRefreshToken, nil
+	}
+
+	// ถ้าวิ่งมาถึงตรงนี้ แปลว่าหา Token ไม่เจอเลย
+	return nil, mongo.ErrNoDocuments
 }
