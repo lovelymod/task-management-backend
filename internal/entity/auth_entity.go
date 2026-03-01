@@ -15,6 +15,7 @@ type RegisterRequest struct {
 }
 
 type AuthRepository interface {
+	GetUserByEmail(ctx context.Context, email string) ([]User, error)
 	Register(ctx context.Context, registerUser *User) (*User, error)
 }
 type AuthUsecase interface {

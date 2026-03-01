@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"time"
 
@@ -25,6 +26,15 @@ func NewAuthUsecase(authRepository entity.AuthRepository, timeout time.Duration,
 func (u *authUsecase) Register(req *entity.RegisterRequest) (*entity.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
+
+	existingUser, err := u.authRepository.GetUserByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(existingUser) > 0 {
+		return nil, errors.New("this_email_already_exists")
+	}
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), u.cost)
 	if err != nil {
