@@ -14,13 +14,20 @@ type RegisterRequest struct {
 	Password    string `json:"password" binding:"required"`
 }
 
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 type AuthRepository interface {
 	GetUserByEmail(ctx context.Context, email string) ([]User, error)
 	Register(ctx context.Context, registerUser *User) (*User, error)
 }
 type AuthUsecase interface {
 	Register(req *RegisterRequest) (*User, error)
+	Login(req *LoginRequest) (*User, error)
 }
 type AuthHandler interface {
 	Register(c *gin.Context)
+	Login(c *gin.Context)
 }

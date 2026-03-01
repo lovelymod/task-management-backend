@@ -53,3 +53,23 @@ func (u *authUsecase) Register(req *entity.RegisterRequest) (*entity.User, error
 
 	return u.authRepository.Register(ctx, &registerUser)
 }
+
+func (u *authUsecase) Login(req *entity.LoginRequest) (*entity.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
+	defer cancel()
+
+	existingUser, err := u.authRepository.GetUserByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(existingUser) == 0 {
+		return nil, errors.New("wrong_email_or_password")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(existingUser[0].HashedPassword), []byte(req.Password)); err != nil {
+		return nil, errors.New("wrong_email_or_password")
+	}
+
+	return &existingUser[0], nil
+}

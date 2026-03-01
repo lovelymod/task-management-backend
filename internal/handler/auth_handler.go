@@ -35,9 +35,36 @@ func (h *authHandler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, entity.Response{
+	c.JSON(http.StatusCreated, entity.Response{
 		Data:      user,
 		Message:   "user_created",
+		IsSuccess: true,
+	})
+}
+
+func (h *authHandler) Login(c *gin.Context) {
+	var req entity.LoginRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	user, err := h.authUsecase.Login(&req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, entity.Response{
+		Data:      user,
+		Message:   "user_logged_in",
 		IsSuccess: true,
 	})
 }
