@@ -17,9 +17,9 @@ import (
 func main() {
 	router := gin.Default()
 
-	application := bootstrap.AppInit()
+	app := bootstrap.AppInit()
 
-	fmt.Println(application)
+	fmt.Println(app)
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Welcome Gin Server")

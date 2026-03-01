@@ -9,7 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 )
 
-func mongoInit(config *Config) *mongo.Client {
+type MongoCollections struct {
+	Users *mongo.Collection
+}
+
+func mongoInit(config *Config) *MongoCollections {
 	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(config.MONGO_CONNECTION).SetServerAPIOptions(serverAPI)
@@ -29,5 +33,9 @@ func mongoInit(config *Config) *mongo.Client {
 	}
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
-	return client
+	mc := MongoCollections{
+		Users: client.Database("task-db").Collection("users"),
+	}
+
+	return &mc
 }
