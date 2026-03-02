@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"time"
 
@@ -42,7 +41,7 @@ func (u *authUsecase) Register(req *entity.RegisterRequest) (*entity.User, error
 	}
 
 	if len(existingUser) > 0 {
-		return nil, errors.New("this_email_already_exists")
+		return nil, entity.ErrAuthThisEmailIsAlreadyUsed
 	}
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), u.cost)
@@ -74,11 +73,11 @@ func (u *authUsecase) Login(req *entity.LoginRequest, clientIP string, userAgent
 	}
 
 	if len(existingUser) == 0 {
-		return nil, errors.New("wrong_email_or_password")
+		return nil, entity.ErrAuthWrongEmailOrPassword
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(existingUser[0].HashedPassword), []byte(req.Password)); err != nil {
-		return nil, errors.New("wrong_email_or_password")
+		return nil, entity.ErrAuthWrongEmailOrPassword
 	}
 
 	_, signedAccessToken, err := utils.SignAccessToken(&existingUser[0], u.accessTokenSecret)
@@ -137,7 +136,7 @@ func (u *authUsecase) RefreshToken(token string, clientIP string, userAgent stri
 	}
 
 	if existingRefreshToken.IsRevoked || time.Now().After(existingRefreshToken.ExpiresAt) {
-		return nil, errors.New("refresh_token_expired")
+		return nil, entity.ErrAuthRefreshTokenExpired
 	}
 
 	// Sign new accessToken
@@ -194,8 +193,5 @@ func (u *authUsecase) Logout(token string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
 
-	if err := u.repo.RevokeRefreshToken(ctx, token); err != nil {
-		return err
-	}
-	return nil
+	return u.repo.RevokeRefreshToken(ctx, token)
 }

@@ -29,21 +29,21 @@ func SignAccessToken(user *entity.User, secret string) (*jwt.RegisteredClaims, s
 func ParseAccessToken(tokenString string, secret string) (*jwt.RegisteredClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid_token")
+			return nil, entity.ErrAuthAccessTokenInvalid
 		}
 		return []byte(secret), nil
 	})
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, errors.New("token_expired")
+			return nil, entity.ErrAuthAccessTokenExpired
 		}
-		return nil, errors.New("invalid_token")
+		return nil, entity.ErrAuthAccessTokenInvalid
 	}
 
 	claim, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
-		return nil, errors.New("invalid_token")
+		return nil, entity.ErrAuthAccessTokenInvalid
 	}
 
 	return claim, nil
@@ -70,21 +70,21 @@ func SignRefreshToken(user *entity.User, secret string) (*jwt.RegisteredClaims, 
 func ParseRefreshToken(tokenString string, secret string) (*jwt.RegisteredClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid_token")
+			return nil, entity.ErrAuthRefreshTokenInvalid
 		}
 		return []byte(secret), nil
 	})
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, errors.New("token_expired")
+			return nil, entity.ErrAuthRefreshTokenExpired
 		}
-		return nil, errors.New("invalid_token")
+		return nil, entity.ErrAuthRefreshTokenInvalid
 	}
 
 	claim, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
-		return nil, errors.New("invalid_token")
+		return nil, entity.ErrAuthRefreshTokenInvalid
 	}
 
 	return claim, nil

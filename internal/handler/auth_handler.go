@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lovelymod/task-management-backend/internal/entity"
+	"github.com/lovelymod/task-management-backend/utils"
 )
 
 type authHandler struct {
@@ -28,7 +29,7 @@ func (h *authHandler) Register(c *gin.Context) {
 
 	user, err := h.authUsecase.Register(&req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.Response{
+		c.JSON(utils.GetStatusError(err), entity.Response{
 			Message:   err.Error(),
 			IsSuccess: false,
 		})
@@ -55,7 +56,7 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	tokens, err := h.authUsecase.Login(&req, c.ClientIP(), c.Request.UserAgent())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.Response{
+		c.JSON(utils.GetStatusError(err), entity.Response{
 			Message:   err.Error(),
 			IsSuccess: false,
 		})
@@ -82,7 +83,7 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 
 	tokens, err := h.authUsecase.RefreshToken(token, c.ClientIP(), c.Request.UserAgent())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, entity.Response{
+		c.JSON(utils.GetStatusError(err), entity.Response{
 			Message:   err.Error(),
 			IsSuccess: false,
 		})
@@ -108,7 +109,7 @@ func (h *authHandler) Logout(c *gin.Context) {
 	}
 
 	if err := h.authUsecase.Logout(token); err != nil {
-		c.JSON(http.StatusInternalServerError, entity.Response{
+		c.JSON(utils.GetStatusError(err), entity.Response{
 			Message:   err.Error(),
 			IsSuccess: false,
 		})

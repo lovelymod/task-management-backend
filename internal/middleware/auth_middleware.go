@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"errors"
 	"net/http"
 	"strings"
 
@@ -13,26 +12,26 @@ import (
 
 func AuthMiddleware(config *bootstrap.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		at := c.GetHeader("Authorization")
-		splitAT := strings.Split(at, " ")
+		bearerToken := c.GetHeader("Authorization")
+		splitToken := strings.Split(bearerToken, " ")
 
-		if len(splitAT) != 2 || splitAT[0] != "Bearer" {
+		if len(splitToken) != 2 || splitToken[0] != "Bearer" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Response{
-				Message:   errors.New("invalid_token").Error(),
+				Message:   entity.ErrAuthAccessTokenInvalid.Error(),
 				IsSuccess: false,
 			})
 			return
 		}
 
-		if splitAT[1] == "" {
+		if splitToken[1] == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Response{
-				Message:   errors.New("token_not_provided").Error(),
+				Message:   entity.ErrAuthAccessTokenNotProvided.Error(),
 				IsSuccess: false,
 			})
 			return
 		}
 
-		claims, err := utils.ParseAccessToken(splitAT[1], config.ACCESS_TOKEN_SECRET)
+		claims, err := utils.ParseAccessToken(splitToken[1], config.ACCESS_TOKEN_SECRET)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Response{
 				Message:   err.Error(),

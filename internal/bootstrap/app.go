@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -16,6 +18,7 @@ type Application struct {
 
 func AppInit() *Application {
 	gin.SetMode(gin.ReleaseMode)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	config := configInit()
 	client, mc := mongoInit(config)
