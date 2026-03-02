@@ -41,7 +41,7 @@ func AuthMiddleware(config *bootstrap.Config) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userID", claims.Subject)
+		c.Set("userId", claims.Subject)
 		c.Next()
 	}
 }

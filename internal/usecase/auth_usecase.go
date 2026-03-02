@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"errors"
-	"log"
 	"strconv"
 	"time"
 
@@ -55,6 +54,7 @@ func (u *authUsecase) Register(req *entity.RegisterRequest) (*entity.User, error
 		ID:             bson.NewObjectID(),
 		FirstName:      req.FirstName,
 		LastName:       req.LastName,
+		DisplayName:    req.DisplayName,
 		Email:          req.Email,
 		HashedPassword: string(hashPassword),
 		CreatedAt:      time.Now(),
@@ -64,7 +64,7 @@ func (u *authUsecase) Register(req *entity.RegisterRequest) (*entity.User, error
 	return u.repo.CreateUser(ctx, &registerUser)
 }
 
-func (u *authUsecase) Login(req *entity.LoginRequest) (*entity.LoginResponse, error) {
+func (u *authUsecase) Login(req *entity.LoginRequest, clientIP string, userAgent string) (*entity.LoginResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
 
@@ -100,6 +100,8 @@ func (u *authUsecase) Login(req *entity.LoginRequest) (*entity.LoginResponse, er
 		Token:     signedRefreshToken,
 		TokenID:   tokenID,
 		UserID:    existingUser[0].ID,
+		ClientIP:  clientIP,
+		UserAgent: userAgent,
 		IsRevoked: false,
 		ExpiresAt: claimsRefreshToken.ExpiresAt.Time,
 		CreatedAt: time.Now(),
@@ -118,7 +120,7 @@ func (u *authUsecase) Login(req *entity.LoginRequest) (*entity.LoginResponse, er
 	return &response, nil
 }
 
-func (u *authUsecase) RefreshToken(token string) (*entity.RefreshTokenResponse, error) {
+func (u *authUsecase) RefreshToken(token string, clientIP string, userAgent string) (*entity.RefreshTokenResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
 	defer cancel()
 
@@ -154,9 +156,8 @@ func (u *authUsecase) RefreshToken(token string) (*entity.RefreshTokenResponse, 
 	if err != nil {
 		return nil, err
 	}
-	userID, err := bson.ObjectIDFromHex(newRefreshTokenClaims.Subject)
+	userId, err := bson.ObjectIDFromHex(newRefreshTokenClaims.Subject)
 	if err != nil {
-		log.Println("asdasdas")
 		return nil, err
 	}
 
@@ -164,7 +165,9 @@ func (u *authUsecase) RefreshToken(token string) (*entity.RefreshTokenResponse, 
 		ID:        bson.NewObjectID(),
 		Token:     newRefreshToken,
 		TokenID:   tokenID,
-		UserID:    userID,
+		UserID:    userId,
+		ClientIP:  clientIP,
+		UserAgent: userAgent,
 		IsRevoked: false,
 		ExpiresAt: newRefreshTokenClaims.ExpiresAt.Time,
 		CreatedAt: time.Now(),

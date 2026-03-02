@@ -13,7 +13,7 @@ func SignAccessToken(user *entity.User, secret string) (*jwt.RegisteredClaims, s
 	secretKey := []byte(secret)
 
 	claims := &jwt.RegisteredClaims{
-		Issuer:    "blogging-platform-api",
+		Issuer:    "task-management-api",
 		Subject:   user.ID.Hex(),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
@@ -53,7 +53,7 @@ func SignRefreshToken(user *entity.User, secret string) (*jwt.RegisteredClaims, 
 	secretKey := []byte(secret)
 
 	claims := &jwt.RegisteredClaims{
-		Issuer:    "blogging-platform-api",
+		Issuer:    "task-management-api",
 		Subject:   user.ID.Hex(),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),

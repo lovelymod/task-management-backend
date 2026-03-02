@@ -38,8 +38,8 @@ type AuthRepository interface {
 }
 type AuthUsecase interface {
 	Register(req *RegisterRequest) (*User, error)
-	Login(req *LoginRequest) (*LoginResponse, error)
-	RefreshToken(token string) (*RefreshTokenResponse, error)
+	Login(req *LoginRequest, clientIP string, userAgent string) (*LoginResponse, error)
+	RefreshToken(token string, clientIP string, userAgent string) (*RefreshTokenResponse, error)
 	Logout(token string) error
 }
 type AuthHandler interface {

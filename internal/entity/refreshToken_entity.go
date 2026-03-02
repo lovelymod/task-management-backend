@@ -12,6 +12,8 @@ type RefreshToken struct {
 	TokenID   bson.ObjectID `json:"tokenId" bson:"tokenId,omitempty"`
 	UserID    bson.ObjectID `json:"userId" bson:"userId,omitempty"`
 	User      *User         `json:"user,omitempty" bson:"user,omitempty"`
+	ClientIP  string        `json:"clientIp" bson:"clientIp"`
+	UserAgent string        `json:"userAgent" bson:"userAgent"`
 	IsRevoked bool          `json:"isRevoked" bson:"isRevoked"`
 	ExpiresAt time.Time     `json:"expiresAt" bson:"expiresAt"`
 	CreatedAt time.Time     `json:"createdAt" bson:"createdAt"`

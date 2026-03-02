@@ -53,7 +53,7 @@ func (h *authHandler) Login(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.authUsecase.Login(&req)
+	tokens, err := h.authUsecase.Login(&req, c.ClientIP(), c.Request.UserAgent())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, entity.Response{
 			Message:   err.Error(),
@@ -80,7 +80,7 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.authUsecase.RefreshToken(token)
+	tokens, err := h.authUsecase.RefreshToken(token, c.ClientIP(), c.Request.UserAgent())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, entity.Response{
 			Message:   err.Error(),
