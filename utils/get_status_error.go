@@ -5,13 +5,14 @@ import (
 	"net/http"
 
 	"github.com/lovelymod/task-management-backend/internal/entity"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func GetStatusError(err error) int {
 	if errors.Is(err, entity.ErrGlobalServerError) {
 		return http.StatusInternalServerError
 	}
-	if errors.Is(err, entity.ErrGlobalNotFound) {
+	if errors.Is(err, entity.ErrGlobalNotFound) || errors.Is(err, mongo.ErrNoDocuments) {
 		return http.StatusNotFound
 	}
 	if errors.Is(err, entity.ErrAuthRefreshTokenExpired) ||
@@ -20,7 +21,7 @@ func GetStatusError(err error) int {
 		errors.Is(err, entity.ErrAuthAccessTokenExpired) ||
 		errors.Is(err, entity.ErrAuthAccessTokenInvalid) ||
 		errors.Is(err, entity.ErrAuthAccessTokenNotProvided) ||
-		errors.Is(err, entity.ErrAuthThisEmailIsAlreadyUsed) {
+		errors.Is(err, entity.ErrAuthWrongEmailOrPassword) {
 		return http.StatusUnauthorized
 	}
 

@@ -20,6 +20,8 @@ import (
 func main() {
 	r := gin.Default()
 
+	// handle err in repo and usecase
+
 	app := bootstrap.AppInit()
 	defer func() {
 		if err := app.Client.Disconnect(context.TODO()); err != nil {
@@ -65,5 +67,4 @@ func main() {
 		log.Println("Server Shutdown:", err)
 	}
 	log.Println("Server exiting")
-
 }

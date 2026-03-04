@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/lovelymod/task-management-backend/internal/bootstrap"
@@ -27,12 +28,14 @@ func (r *authRepository) GetUserByEmail(ctx context.Context, email string) ([]en
 
 	cursor, err := r.mc.Users.Find(ctx, filter, opts)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 	defer cursor.Close(ctx)
 
 	if err := cursor.All(ctx, &exitingUser); err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 
 	return exitingUser, nil
@@ -40,7 +43,8 @@ func (r *authRepository) GetUserByEmail(ctx context.Context, email string) ([]en
 
 func (r *authRepository) CreateUser(ctx context.Context, registerUser *entity.User) (*entity.User, error) {
 	if _, err := r.mc.Users.InsertOne(ctx, registerUser); err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 
 	return registerUser, nil
@@ -48,7 +52,8 @@ func (r *authRepository) CreateUser(ctx context.Context, registerUser *entity.Us
 
 func (r *authRepository) CreateRefreshToken(ctx context.Context, refreshToken *entity.RefreshToken) error {
 	if _, err := r.mc.RefreshTokens.InsertOne(ctx, refreshToken); err != nil {
-		return err
+		log.Println(err)
+		return entity.ErrGlobalServerError
 	}
 	return nil
 }
@@ -63,7 +68,8 @@ func (r *authRepository) RevokeRefreshToken(ctx context.Context, token string) e
 	}
 
 	if _, err := r.mc.RefreshTokens.UpdateOne(ctx, filter, update); err != nil {
-		return err
+		log.Println(err)
+		return entity.ErrGlobalServerError
 	}
 	return nil
 }
@@ -92,7 +98,8 @@ func (r *authRepository) GetRefreshToken(ctx context.Context, token string) (*en
 	// ใช้คำสั่ง Aggregate แทน FindOne
 	cursor, err := r.mc.RefreshTokens.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 	defer cursor.Close(ctx) // อย่าลืมปิด cursor เสมอ
 
@@ -100,7 +107,8 @@ func (r *authRepository) GetRefreshToken(ctx context.Context, token string) (*en
 	if cursor.Next(ctx) {
 		var existingRefreshToken entity.RefreshToken
 		if err := cursor.Decode(&existingRefreshToken); err != nil {
-			return nil, err
+			log.Println(err)
+			return nil, entity.ErrGlobalServerError
 		}
 		return &existingRefreshToken, nil
 	}

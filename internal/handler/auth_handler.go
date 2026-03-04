@@ -75,7 +75,7 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 	token, err := c.Cookie("refreshToken")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, entity.Response{
-			Message:   "unauthorized",
+			Message:   entity.ErrAuthRefreshTokenNotProvided.Error(),
 			IsSuccess: false,
 		})
 		return
@@ -102,7 +102,7 @@ func (h *authHandler) Logout(c *gin.Context) {
 	token, err := c.Cookie("refreshToken")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, entity.Response{
-			Message:   "unauthorized",
+			Message:   entity.ErrAuthRefreshTokenNotProvided.Error(),
 			IsSuccess: false,
 		})
 		return

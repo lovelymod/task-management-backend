@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 	"strconv"
 	"time"
 
@@ -46,7 +47,8 @@ func (u *authUsecase) Register(req *entity.RegisterRequest) (*entity.User, error
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), u.cost)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 
 	registerUser := entity.User{
@@ -92,7 +94,8 @@ func (u *authUsecase) Login(req *entity.LoginRequest, clientIP string, userAgent
 
 	tokenID, err := bson.ObjectIDFromHex(claimsRefreshToken.ID)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 	savedRefreshToken := entity.RefreshToken{
 		ID:        bson.NewObjectID(),
@@ -153,11 +156,13 @@ func (u *authUsecase) RefreshToken(token string, clientIP string, userAgent stri
 
 	tokenID, err := bson.ObjectIDFromHex(newRefreshTokenClaims.ID)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 	userId, err := bson.ObjectIDFromHex(newRefreshTokenClaims.Subject)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, entity.ErrGlobalServerError
 	}
 
 	savedRefreshToken := entity.RefreshToken{

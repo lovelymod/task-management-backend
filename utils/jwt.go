@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -23,7 +24,12 @@ func SignAccessToken(user *entity.User, secret string) (*jwt.RegisteredClaims, s
 
 	sign, err := token.SignedString(secretKey)
 
-	return claims, sign, err
+	if err != nil {
+		log.Println(err)
+		return nil, "", entity.ErrGlobalServerError
+	}
+
+	return claims, sign, nil
 }
 
 func ParseAccessToken(tokenString string, secret string) (*jwt.RegisteredClaims, error) {
@@ -35,6 +41,7 @@ func ParseAccessToken(tokenString string, secret string) (*jwt.RegisteredClaims,
 	})
 
 	if err != nil {
+		log.Println(err)
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, entity.ErrAuthAccessTokenExpired
 		}
@@ -43,6 +50,7 @@ func ParseAccessToken(tokenString string, secret string) (*jwt.RegisteredClaims,
 
 	claim, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
+		log.Println("can't parse token claims")
 		return nil, entity.ErrAuthAccessTokenInvalid
 	}
 
@@ -64,7 +72,12 @@ func SignRefreshToken(user *entity.User, secret string) (*jwt.RegisteredClaims, 
 
 	sign, err := token.SignedString(secretKey)
 
-	return claims, sign, err
+	if err != nil {
+		log.Println(err)
+		return nil, "", entity.ErrGlobalServerError
+	}
+
+	return claims, sign, nil
 }
 
 func ParseRefreshToken(tokenString string, secret string) (*jwt.RegisteredClaims, error) {
@@ -76,6 +89,7 @@ func ParseRefreshToken(tokenString string, secret string) (*jwt.RegisteredClaims
 	})
 
 	if err != nil {
+		log.Println(err)
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, entity.ErrAuthRefreshTokenExpired
 		}
@@ -84,6 +98,7 @@ func ParseRefreshToken(tokenString string, secret string) (*jwt.RegisteredClaims
 
 	claim, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
+		log.Println("can't parse token claims")
 		return nil, entity.ErrAuthRefreshTokenInvalid
 	}
 
