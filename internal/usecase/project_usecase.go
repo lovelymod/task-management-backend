@@ -110,3 +110,31 @@ func (u *projectUsecase) UpdateProject(req *entity.UpdateProjectRequest, strProj
 
 	return nil
 }
+
+func (u *projectUsecase) DeleteProject(strProjId string, strUserId string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
+	defer cancel()
+
+	projId, err := bson.ObjectIDFromHex(strProjId)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrProjectInvalidProjectId
+	}
+
+	userId, err := bson.ObjectIDFromHex(strUserId)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrAuthAccessTokenInvalid
+	}
+
+	existingProject, err := u.repo.GetProjectById(ctx, projId)
+	if err != nil {
+		return err
+	}
+
+	if !utils.CheckPermission(existingProject.Members, userId, []entity.Role{entity.RoleOwner}) {
+		return entity.ErrGlobalNotHavePermission
+	}
+
+	return u.repo.DeleteProject(ctx, projId)
+}

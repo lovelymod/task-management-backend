@@ -61,3 +61,17 @@ func (r *projectRepository) UpdateProject(ctx context.Context, project *entity.P
 
 	return nil
 }
+
+func (r *projectRepository) DeleteProject(ctx context.Context, id bson.ObjectID) error {
+	filter := bson.D{{Key: "_id", Value: id}}
+
+	if _, err := r.mc.Projects.DeleteOne(ctx, filter); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return entity.ErrGlobalNotFound
+		}
+		log.Println(err)
+		return entity.ErrGlobalServerError
+	}
+
+	return nil
+}

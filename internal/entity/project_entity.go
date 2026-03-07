@@ -58,18 +58,36 @@ type UpdateProjectRequest struct {
 	Description string `json:"description"`
 }
 
+type CreateStatusRequest struct {
+	Name  string `json:"name" binding:"required"`
+	Color string `json:"color"`
+}
+type UpdateStatusRequest struct {
+	Name  string `json:"name" binding:"required"`
+	Color string `json:"color"`
+}
+
 type ProjectRepository interface {
 	GetProjectById(ctx context.Context, id bson.ObjectID) (*Project, error)
 	CreateProject(ctx context.Context, project *Project) error
 	UpdateProject(ctx context.Context, project *Project) error
+	DeleteProject(ctx context.Context, id bson.ObjectID) error
+
+	// CreateStatus(ctx context.Context, status TaskStatus) error
 }
 
 type ProjectUsecase interface {
 	CreateProject(req *CreateProjectRequest, strUserId string) error
 	UpdateProject(req *UpdateProjectRequest, strProjId string, strUserId string) error
+	DeleteProject(strProjId string, strUserId string) error
+
+	// CreateStatus(req *CreateStatusRequest, strProjId string) error
 }
 
 type ProjectHandler interface {
 	CreateProject(c *gin.Context)
 	UpdateProject(c *gin.Context)
+	DeleteProject(c *gin.Context)
+
+	// CreateStatus(c *gin.Context)
 }

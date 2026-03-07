@@ -12,7 +12,7 @@ type projectHandler struct {
 	usecase entity.ProjectUsecase
 }
 
-func NewProjectHandler(usecase entity.ProjectUsecase) *projectHandler {
+func NewProjectHandler(usecase entity.ProjectUsecase) entity.ProjectHandler {
 	return &projectHandler{
 		usecase: usecase,
 	}
@@ -89,6 +89,32 @@ func (h *projectHandler) UpdateProject(c *gin.Context) {
 
 	c.JSON(http.StatusOK, entity.Response{
 		Message:   "updated",
+		IsSuccess: true,
+	})
+}
+
+func (h *projectHandler) DeleteProject(c *gin.Context) {
+	strProjId := c.Param("id")
+
+	strUserId, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, entity.Response{
+			Message:   entity.ErrAuthAccessTokenInvalid.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	if err := h.usecase.DeleteProject(strProjId, strUserId.(string)); err != nil {
+		c.JSON(utils.GetStatusError(err), entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, entity.Response{
+		Message:   "deleted",
 		IsSuccess: true,
 	})
 }
