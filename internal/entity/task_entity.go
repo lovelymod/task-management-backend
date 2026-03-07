@@ -28,12 +28,12 @@ type Task struct {
 	ID          bson.ObjectID   `json:"id" bson:"_id,omitempty"`
 	Title       string          `json:"title" bson:"title"`
 	Description string          `json:"description" bson:"description"`
-	StatusID    bson.ObjectID   `json:"statusId" bson:"statusId"`
+	StatusID    bson.ObjectID   `json:"statusId" bson:"status_id"`
 	Priority    Priority        `json:"priority" bson:"priority"`
 	Assignees   []bson.ObjectID `json:"assignees" bson:"assignees"`
-	ProjectID   bson.ObjectID   `json:"projectId" bson:"projectId"`
-	DueDate     time.Time       `json:"dueDate" bson:"dueDate"`
-	CreatedBy   bson.ObjectID   `json:"createdBy" bson:"createdBy"`
-	CreatedAt   time.Time       `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   time.Time       `json:"updatedAt" bson:"updatedAt"`
+	ProjectID   bson.ObjectID   `json:"projectId" bson:"project_id"`
+	DueDate     time.Time       `json:"dueDate" bson:"due_date"`
+	CreatedBy   bson.ObjectID   `json:"createdBy" bson:"created_by"`
+	CreatedAt   time.Time       `json:"createdAt" bson:"created_at"`
+	UpdatedAt   time.Time       `json:"updatedAt" bson:"updated_at"`
 }

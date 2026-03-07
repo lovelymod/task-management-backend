@@ -30,14 +30,14 @@ type Project struct {
 	Name        string          `json:"name" bson:"name"`
 	Description string          `json:"description" bson:"description"`
 	Members     []ProjectMember `json:"members" bson:"members"`
-	CreatedBy   bson.ObjectID   `json:"createdBy" bson:"createdBy"`
-	CreatedAt   time.Time       `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   time.Time       `json:"updatedAt" bson:"updatedAt"`
+	CreatedBy   bson.ObjectID   `json:"createdBy" bson:"created_by"`
+	CreatedAt   time.Time       `json:"createdAt" bson:"created_at"`
+	UpdatedAt   time.Time       `json:"updatedAt" bson:"updated_at"`
 	Statuses    []TaskStatus    `json:"statuses" bson:"statuses"`
 }
 
 type ProjectMember struct {
-	UserID bson.ObjectID `json:"userId" bson:"userId"`
+	UserID bson.ObjectID `json:"userId" bson:"user_id"`
 	Role   Role          `json:"role" bson:"role"`
 }
 

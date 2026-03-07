@@ -8,13 +8,13 @@ import (
 
 type User struct {
 	ID             bson.ObjectID `json:"id" bson:"_id,omitempty"`
-	FirstName      string        `json:"firstName" bson:"firstName"`
-	LastName       string        `json:"lastName" bson:"lastName"`
-	DisplayName    string        `json:"displayName" bson:"displayName"`
+	FirstName      string        `json:"firstName" bson:"first_name"`
+	LastName       string        `json:"lastName" bson:"last_name"`
+	DisplayName    string        `json:"displayName" bson:"display_name"`
 	Email          string        `json:"email" bson:"email"`
-	HashedPassword string        `json:"-" bson:"hashedPassword"`
+	HashedPassword string        `json:"-" bson:"hashed_password"`
 	Phone          string        `json:"phone" bson:"phone"`
 	Avatar         string        `json:"avatar" bson:"avatar"`
-	CreatedAt      time.Time     `json:"createdAt" bson:"createdAt"`
-	UpdatedAt      time.Time     `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt      time.Time     `json:"createdAt" bson:"created_at"`
+	UpdatedAt      time.Time     `json:"updatedAt" bson:"updated_at"`
 }

@@ -11,15 +11,15 @@ import (
 type RefreshToken struct {
 	ID        bson.ObjectID `json:"id" bson:"_id,omitempty"`
 	Token     string        `json:"token" bson:"token"`
-	TokenID   bson.ObjectID `json:"tokenId" bson:"tokenId,omitempty"`
-	UserID    bson.ObjectID `json:"userId" bson:"userId,omitempty"`
+	TokenID   bson.ObjectID `json:"tokenId" bson:"token_id,omitempty"`
+	UserID    bson.ObjectID `json:"userId" bson:"user_id,omitempty"`
 	User      *User         `json:"user,omitempty" bson:"user,omitempty"`
-	ClientIP  string        `json:"clientIp" bson:"clientIp"`
-	UserAgent string        `json:"userAgent" bson:"userAgent"`
-	IsRevoked bool          `json:"isRevoked" bson:"isRevoked"`
-	ExpiresAt time.Time     `json:"expiresAt" bson:"expiresAt"`
-	CreatedAt time.Time     `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time     `json:"updatedAt" bson:"updatedAt"`
+	ClientIP  string        `json:"clientIp" bson:"client_ip"`
+	UserAgent string        `json:"userAgent" bson:"user_agent"`
+	IsRevoked bool          `json:"isRevoked" bson:"is_revoked"`
+	ExpiresAt time.Time     `json:"expiresAt" bson:"expires_at"`
+	CreatedAt time.Time     `json:"createdAt" bson:"created_at"`
+	UpdatedAt time.Time     `json:"updatedAt" bson:"updated_at"`
 }
 
 type RegisterRequest struct {

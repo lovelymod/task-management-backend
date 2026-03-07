@@ -62,8 +62,8 @@ func (r *authRepository) RevokeRefreshToken(ctx context.Context, token string) e
 	filter := bson.D{{Key: "token", Value: token}}
 	update := bson.M{
 		"$set": bson.M{
-			"isRevoked": true,
-			"updatedAt": time.Now(),
+			"is_revoked": true,
+			"updated_at": time.Now(),
 		},
 	}
 
@@ -83,7 +83,7 @@ func (r *authRepository) GetRefreshToken(ctx context.Context, token string) (*en
 		// 2. $lookup: สั่ง Join ไปที่ Collection "users"
 		bson.D{{Key: "$lookup", Value: bson.D{
 			{Key: "from", Value: "users"},        // ชื่อ collection ที่เราจะไปดึงข้อมูลมา (ต้องเป็นชื่อใน DB)
-			{Key: "localField", Value: "userId"}, // ฟิลด์ในตาราง refresh_tokens ปัจจุบัน
+			{Key: "localField", Value: "user_id"}, // ฟิลด์ในตาราง refresh_tokens ปัจจุบัน
 			{Key: "foreignField", Value: "_id"},  // ฟิลด์ที่จะไปเทียบในตาราง users
 			{Key: "as", Value: "user"},           // ชื่อฟิลด์ผลลัพธ์ที่จะเก็บลงใน Struct (ต้องตรงกับ bson:"user" ด้านบน)
 		}}},

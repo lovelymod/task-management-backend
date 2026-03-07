@@ -50,7 +50,7 @@ func (r *projectRepository) UpdateProject(ctx context.Context, project *entity.P
 		{Key: "$set", Value: bson.D{
 			{Key: "name", Value: project.Name},
 			{Key: "description", Value: project.Description},
-			{Key: "updatedAt", Value: project.UpdatedAt},
+			{Key: "updated_at", Value: project.UpdatedAt},
 		}},
 	}
 
