@@ -96,17 +96,15 @@ func (u *projectUsecase) UpdateProject(req *entity.UpdateProjectRequest, strProj
 	}
 
 	allowedRole := []entity.Role{entity.RoleOwner, entity.RoleManager}
-	if hasPermission := utils.CheckPermission(existingProject.Members, userID, allowedRole); !hasPermission {
+	if !utils.CheckPermission(existingProject.Members, userID, allowedRole) {
 		return entity.ErrGlobalNotHavePermission
 	}
 
-	project := entity.Project{
-		ID:          projId,
-		Name:        req.Name,
-		Description: req.Description,
-	}
+	existingProject.Name = req.Name
+	existingProject.Description = req.Description
+	existingProject.UpdatedAt = time.Now()
 
-	if err := u.repo.UpdateProject(ctx, &project); err != nil {
+	if err := u.repo.UpdateProject(ctx, existingProject); err != nil {
 		return err
 	}
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"time"
 
 	"github.com/lovelymod/task-management-backend/internal/bootstrap"
 	"github.com/lovelymod/task-management-backend/internal/entity"
@@ -51,7 +50,7 @@ func (r *projectRepository) UpdateProject(ctx context.Context, project *entity.P
 		{Key: "$set", Value: bson.D{
 			{Key: "name", Value: project.Name},
 			{Key: "description", Value: project.Description},
-			{Key: "updatedAt", Value: time.Now()},
+			{Key: "updatedAt", Value: project.UpdatedAt},
 		}},
 	}
 
