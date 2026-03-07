@@ -11,6 +11,8 @@ import (
 
 type MongoCollections struct {
 	Users         *mongo.Collection
+	Projects      *mongo.Collection
+	Tasks         *mongo.Collection
 	RefreshTokens *mongo.Collection
 }
 
@@ -31,6 +33,8 @@ func mongoInit(config *Config) (*mongo.Client, *MongoCollections) {
 
 	mc := MongoCollections{
 		Users:         client.Database("task-db").Collection("users"),
+		Projects:      client.Database("task-db").Collection("projects"),
+		Tasks:         client.Database("task-db").Collection("tasks"),
 		RefreshTokens: client.Database("task-db").Collection("refresh_tokens"),
 	}
 

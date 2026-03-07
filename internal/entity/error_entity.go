@@ -8,6 +8,7 @@ var (
 	ErrGlobalNotFound               = errors.New("not_found")
 	ErrGlobalFileSizeExceedLimit    = errors.New("file_size_exceed_limit")
 	ErrGlobalInvalidFileContentType = errors.New("invalid_file_content_type")
+	ErrGlobalNotHavePermission      = errors.New("not_have_permission")
 
 	// Auth Errors
 	ErrAuthThisEmailIsAlreadyUsed = errors.New("this_email_is_already_used")
@@ -20,4 +21,8 @@ var (
 	ErrAuthRefreshTokenExpired     = errors.New("refresh_token_expired")
 	ErrAuthRefreshTokenInvalid     = errors.New("refresh_token_invalid")
 	ErrAuthRefreshTokenNotProvided = errors.New("refresh_token_not_provided")
+
+	// Project Errors
+	ErrProjectInvalidProjectId    = errors.New("invalid_project_id")
+	ErrProjectProjectIdIsRequired = errors.New("project_id_is_required")
 )

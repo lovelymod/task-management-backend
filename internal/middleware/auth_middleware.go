@@ -15,17 +15,17 @@ func AuthMiddleware(config *bootstrap.Config) gin.HandlerFunc {
 		bearerToken := c.GetHeader("Authorization")
 		splitToken := strings.Split(bearerToken, " ")
 
-		if len(splitToken) != 2 || splitToken[0] != "Bearer" {
+		if len(splitToken) != 2 || splitToken[1] == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Response{
-				Message:   entity.ErrAuthAccessTokenInvalid.Error(),
+				Message:   entity.ErrAuthAccessTokenNotProvided.Error(),
 				IsSuccess: false,
 			})
 			return
 		}
 
-		if splitToken[1] == "" {
+		if splitToken[0] != "Bearer" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &entity.Response{
-				Message:   entity.ErrAuthAccessTokenNotProvided.Error(),
+				Message:   entity.ErrAuthAccessTokenInvalid.Error(),
 				IsSuccess: false,
 			})
 			return

@@ -8,11 +8,11 @@ import (
 )
 
 type Handlers struct {
-	AuthHandler entity.AuthHandler
+	AuthHandler    entity.AuthHandler
+	ProjectHandler entity.ProjectHandler
 }
 
 func SetupRouter(r *gin.Engine, handlers *Handlers, config *bootstrap.Config) {
-
 	api := r.Group("/api")
 	{
 		auth := api.Group("/auth")
@@ -21,10 +21,19 @@ func SetupRouter(r *gin.Engine, handlers *Handlers, config *bootstrap.Config) {
 			auth.POST("/login", handlers.AuthHandler.Login)
 			auth.POST("/refresh-token", handlers.AuthHandler.RefreshToken)
 		}
-		private := api.Group("/")
+
+		private := api.Group("")
 		private.Use(middleware.AuthMiddleware(config))
+
+		privateAuth := private.Group("/auth")
 		{
-			private.POST("/auth/logout", handlers.AuthHandler.Logout)
+			privateAuth.POST("/logout", handlers.AuthHandler.Logout)
+		}
+
+		privateProject := private.Group("/project")
+		{
+			privateProject.POST("/", handlers.ProjectHandler.CreateProject)
+			privateProject.PUT("/:id", handlers.ProjectHandler.UpdateProject)
 		}
 
 	}

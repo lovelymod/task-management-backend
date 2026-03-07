@@ -33,8 +33,13 @@ func main() {
 	authUsecase := usecase.NewAuthUsecase(authRepo, time.Second*5, app.Config)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
+	projectRepo := repository.NewProjectRepository(app.Mc)
+	projectUsecase := usecase.NewProjectUsecase(projectRepo, time.Second*5)
+	projectHandler := handler.NewProjectHandler(projectUsecase)
+
 	handlers := router.Handlers{
-		AuthHandler: authHandler,
+		AuthHandler:    authHandler,
+		ProjectHandler: projectHandler,
 	}
 
 	router.SetupRouter(r, &handlers, app.Config)

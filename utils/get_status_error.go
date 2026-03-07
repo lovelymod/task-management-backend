@@ -15,6 +15,9 @@ func GetStatusError(err error) int {
 	if errors.Is(err, entity.ErrGlobalNotFound) || errors.Is(err, mongo.ErrNoDocuments) {
 		return http.StatusNotFound
 	}
+	if errors.Is(err, entity.ErrGlobalNotHavePermission) {
+		return http.StatusForbidden
+	}
 	if errors.Is(err, entity.ErrAuthRefreshTokenExpired) ||
 		errors.Is(err, entity.ErrAuthRefreshTokenInvalid) ||
 		errors.Is(err, entity.ErrAuthRefreshTokenNotProvided) ||

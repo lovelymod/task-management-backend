@@ -8,26 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-type AuthRepository interface {
-	GetUserByEmail(ctx context.Context, email string) ([]User, error)
-	GetRefreshToken(ctx context.Context, token string) (*RefreshToken, error)
-	CreateUser(ctx context.Context, registerUser *User) (*User, error)
-	CreateRefreshToken(ctx context.Context, refreshToken *RefreshToken) error
-	RevokeRefreshToken(ctx context.Context, token string) error
-}
-type AuthUsecase interface {
-	Register(req *RegisterRequest) (*User, error)
-	Login(req *LoginRequest, clientIP string, userAgent string) (*LoginResponse, error)
-	RefreshToken(token string, clientIP string, userAgent string) (*RefreshTokenResponse, error)
-	Logout(token string) error
-}
-type AuthHandler interface {
-	Register(c *gin.Context)
-	Login(c *gin.Context)
-	RefreshToken(c *gin.Context)
-	Logout(c *gin.Context)
-}
-
 type RefreshToken struct {
 	ID        bson.ObjectID `json:"id" bson:"_id,omitempty"`
 	Token     string        `json:"token" bson:"token"`
@@ -63,4 +43,24 @@ type LoginResponse struct {
 type RefreshTokenResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+}
+
+type AuthRepository interface {
+	GetUserByEmail(ctx context.Context, email string) ([]User, error)
+	GetRefreshToken(ctx context.Context, token string) (*RefreshToken, error)
+	CreateUser(ctx context.Context, registerUser *User) (*User, error)
+	CreateRefreshToken(ctx context.Context, refreshToken *RefreshToken) error
+	RevokeRefreshToken(ctx context.Context, token string) error
+}
+type AuthUsecase interface {
+	Register(req *RegisterRequest) (*User, error)
+	Login(req *LoginRequest, clientIP string, userAgent string) (*LoginResponse, error)
+	RefreshToken(token string, clientIP string, userAgent string) (*RefreshTokenResponse, error)
+	Logout(token string) error
+}
+type AuthHandler interface {
+	Register(c *gin.Context)
+	Login(c *gin.Context)
+	RefreshToken(c *gin.Context)
+	Logout(c *gin.Context)
 }
