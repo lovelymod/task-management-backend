@@ -63,17 +63,21 @@ type CreateStatusRequest struct {
 	Color string `json:"color"`
 }
 type UpdateStatusRequest struct {
-	Name  string `json:"name" binding:"required"`
+	ID    string `json:"id" binding:"required"`
+	Name  string `json:"name"`
 	Color string `json:"color"`
+	Order int    `json:"order"`
 }
 
 type ProjectRepository interface {
-	GetProjectById(ctx context.Context, id bson.ObjectID) (*Project, error)
+	GetProjectById(ctx context.Context, projId bson.ObjectID) (*Project, error)
 	CreateProject(ctx context.Context, project *Project) error
 	UpdateProject(ctx context.Context, project *Project) error
-	DeleteProject(ctx context.Context, id bson.ObjectID) error
+	DeleteProject(ctx context.Context, projId bson.ObjectID) error
 
-	// CreateStatus(ctx context.Context, status TaskStatus) error
+	CreateStatus(ctx context.Context, projId bson.ObjectID, status *TaskStatus) error
+	UpdateStatus(ctx context.Context, projId bson.ObjectID, status *TaskStatus) error
+	DeleteStatus(ctx context.Context, projId bson.ObjectID, statusId bson.ObjectID) error
 }
 
 type ProjectUsecase interface {
@@ -81,7 +85,9 @@ type ProjectUsecase interface {
 	UpdateProject(req *UpdateProjectRequest, strProjId string, strUserId string) error
 	DeleteProject(strProjId string, strUserId string) error
 
-	// CreateStatus(req *CreateStatusRequest, strProjId string) error
+	CreateStatus(req *CreateStatusRequest, strProjId string) error
+	UpdateStatus(req *UpdateStatusRequest, strProjId string) error
+	DeleteStatus(strProjId string, strStatusId string) error
 }
 
 type ProjectHandler interface {
@@ -89,5 +95,7 @@ type ProjectHandler interface {
 	UpdateProject(c *gin.Context)
 	DeleteProject(c *gin.Context)
 
-	// CreateStatus(c *gin.Context)
+	CreateStatus(c *gin.Context)
+	UpdateStatus(c *gin.Context)
+	DeleteStatus(c *gin.Context)
 }

@@ -118,3 +118,102 @@ func (h *projectHandler) DeleteProject(c *gin.Context) {
 		IsSuccess: true,
 	})
 }
+
+func (h *projectHandler) CreateStatus(c *gin.Context) {
+	strProjId := c.Param("id")
+	if strProjId == "" {
+		c.JSON(http.StatusBadRequest, entity.Response{
+			Message:   entity.ErrProjectProjectIdIsRequired.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	var req entity.CreateStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	if err := h.usecase.CreateStatus(&req, strProjId); err != nil {
+		c.JSON(utils.GetStatusError(err), entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, entity.Response{
+		Message:   "status_created",
+		IsSuccess: true,
+	})
+}
+
+func (h *projectHandler) UpdateStatus(c *gin.Context) {
+	strProjId := c.Param("id")
+	if strProjId == "" {
+		c.JSON(http.StatusBadRequest, entity.Response{
+			Message:   entity.ErrProjectProjectIdIsRequired.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	var req entity.UpdateStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	if err := h.usecase.UpdateStatus(&req, strProjId); err != nil {
+		c.JSON(utils.GetStatusError(err), entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, entity.Response{
+		Message:   "status_updated",
+		IsSuccess: true,
+	})
+}
+
+func (h *projectHandler) DeleteStatus(c *gin.Context) {
+	strProjId := c.Param("id")
+	if strProjId == "" {
+		c.JSON(http.StatusBadRequest, entity.Response{
+			Message:   entity.ErrProjectProjectIdIsRequired.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	strStatusId := c.Param("status-id")
+	if strStatusId == "" {
+		c.JSON(http.StatusBadRequest, entity.Response{
+			Message:   entity.ErrProjectStatusIdIsRequired.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	if err := h.usecase.DeleteStatus(strProjId, strStatusId); err != nil {
+		c.JSON(utils.GetStatusError(err), entity.Response{
+			Message:   err.Error(),
+			IsSuccess: false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, entity.Response{
+		Message:   "status_deleted",
+		IsSuccess: true,
+	})
+}

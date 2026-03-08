@@ -24,5 +24,8 @@ var (
 
 	// Project Errors
 	ErrProjectInvalidProjectId    = errors.New("invalid_project_id")
+	ErrProjectInvalidStatusId     = errors.New("invalid_status_id")
 	ErrProjectProjectIdIsRequired = errors.New("project_id_is_required")
+	ErrProjectStatusIdIsRequired  = errors.New("status_id_is_required")
+	ErrProjectDuplicateStatusName = errors.New("duplicate_status_name")
 )

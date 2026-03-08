@@ -75,3 +75,88 @@ func (r *projectRepository) DeleteProject(ctx context.Context, id bson.ObjectID)
 
 	return nil
 }
+
+func (r *projectRepository) CreateStatus(ctx context.Context, projId bson.ObjectID, status *entity.TaskStatus) error {
+
+	filter := bson.D{
+		{Key: "_id", Value: projId},
+	}
+
+	update := bson.D{
+		{Key: "$push", Value: bson.D{
+			{Key: "statuses", Value: bson.D{
+				{Key: "_id", Value: status.ID},
+				{Key: "name", Value: status.Name},
+				{Key: "color", Value: status.Color},
+				{Key: "order", Value: status.Order},
+			}},
+		}},
+	}
+
+	result, err := r.mc.Projects.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrGlobalServerError
+	}
+
+	if result.MatchedCount == 0 {
+		return entity.ErrGlobalNotFound
+	}
+
+	return nil
+}
+
+func (r *projectRepository) UpdateStatus(ctx context.Context, projId bson.ObjectID, status *entity.TaskStatus) error {
+	filter := bson.D{
+		{Key: "_id", Value: projId},
+		{Key: "statuses._id", Value: status.ID},
+	}
+
+	update := bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "statuses.$.name", Value: status.Name},
+			{Key: "statuses.$.color", Value: status.Color},
+			{Key: "statuses.$.order", Value: status.Order},
+		}},
+	}
+
+	result, err := r.mc.Projects.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrGlobalServerError
+	}
+
+	if result.MatchedCount == 0 {
+		return entity.ErrGlobalNotFound
+	}
+
+	return nil
+}
+
+func (r *projectRepository) DeleteStatus(ctx context.Context, projId bson.ObjectID, statusId bson.ObjectID) error {
+	filter := bson.D{
+		{Key: "_id", Value: projId},
+		{Key: "statuses._id", Value: statusId},
+	}
+
+	update := bson.D{
+		{Key: "$pull", Value: bson.D{
+			{Key: "statuses", Value: bson.D{
+				{Key: "_id", Value: statusId},
+			}},
+		}},
+	}
+
+	result, err := r.mc.Projects.UpdateOne(ctx, filter, update)
+
+	if err != nil {
+		log.Println(err)
+		return entity.ErrGlobalServerError
+	}
+
+	if result.MatchedCount == 0 {
+		return entity.ErrGlobalNotFound
+	}
+
+	return nil
+}

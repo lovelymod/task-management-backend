@@ -1,8 +1,10 @@
 package usecase
 
 import (
+	"cmp"
 	"context"
 	"log"
+	"slices"
 	"time"
 
 	"github.com/lovelymod/task-management-backend/internal/entity"
@@ -137,4 +139,84 @@ func (u *projectUsecase) DeleteProject(strProjId string, strUserId string) error
 	}
 
 	return u.repo.DeleteProject(ctx, projId)
+}
+
+func (u *projectUsecase) CreateStatus(req *entity.CreateStatusRequest, strProjId string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
+	defer cancel()
+
+	projId, err := bson.ObjectIDFromHex(strProjId)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrProjectInvalidProjectId
+	}
+
+	existingProject, err := u.repo.GetProjectById(ctx, projId)
+	if err != nil {
+		return err
+	}
+
+	sortedStatuses := slices.SortedFunc(slices.Values(existingProject.Statuses), func(a, b entity.TaskStatus) int {
+		return cmp.Compare(b.Order, a.Order)
+	})
+
+	for _, s := range sortedStatuses {
+		if s.Name == req.Name {
+			return entity.ErrProjectDuplicateStatusName
+		}
+	}
+
+	status := entity.TaskStatus{
+		ID:    bson.NewObjectID(),
+		Name:  req.Name,
+		Color: req.Color,
+		Order: sortedStatuses[0].Order + 1,
+	}
+
+	return u.repo.CreateStatus(ctx, projId, &status)
+}
+
+func (u *projectUsecase) UpdateStatus(req *entity.UpdateStatusRequest, strProjId string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
+	defer cancel()
+
+	projId, err := bson.ObjectIDFromHex(strProjId)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrProjectInvalidProjectId
+	}
+
+	statusId, err := bson.ObjectIDFromHex(req.ID)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrProjectInvalidStatusId
+	}
+
+	status := entity.TaskStatus{
+		ID:    statusId,
+		Name:  req.Name,
+		Color: req.Color,
+		Order: req.Order,
+	}
+
+	return u.repo.UpdateStatus(ctx, projId, &status)
+}
+
+func (u *projectUsecase) DeleteStatus(strProjId string, strStatusId string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), u.timeout)
+	defer cancel()
+
+	projId, err := bson.ObjectIDFromHex(strProjId)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrProjectInvalidProjectId
+	}
+
+	statusId, err := bson.ObjectIDFromHex(strStatusId)
+	if err != nil {
+		log.Println(err)
+		return entity.ErrProjectInvalidStatusId
+	}
+
+	return u.repo.DeleteStatus(ctx, projId, statusId)
 }

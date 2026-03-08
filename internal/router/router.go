@@ -35,6 +35,10 @@ func SetupRouter(r *gin.Engine, handlers *Handlers, config *bootstrap.Config) {
 			privateProject.POST("/", handlers.ProjectHandler.CreateProject)
 			privateProject.PUT("/:id", handlers.ProjectHandler.UpdateProject)
 			privateProject.DELETE("/:id", handlers.ProjectHandler.DeleteProject)
+
+			privateProject.POST("/:id/status", handlers.ProjectHandler.CreateStatus)
+			privateProject.PUT("/:id/status", handlers.ProjectHandler.UpdateStatus)
+			privateProject.DELETE("/:id/status/:status-id", handlers.ProjectHandler.DeleteStatus)
 		}
 
 	}
